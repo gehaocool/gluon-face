@@ -327,6 +327,7 @@ class FaceResNetV1b(HybridBlock):
         - Yu, Fisher, and Vladlen Koltun. "Multi-scale context aggregation by dilated convolutions."
 
         -
+    TODO: multi-precision training set
     """
     # pylint: disable=unused-variable
     def __init__(self, block, layers, classes=1000, embedding_size=512, dilated=False,
@@ -796,10 +797,9 @@ def face_resnet50_v1d(pretrained=False, root='~/.mxnet/models', ctx=cpu(0), **kw
         Can be :class:`mxnet.gluon.nn.BatchNorm` or :class:`mxnet.gluon.contrib.nn.SyncBatchNorm`.
     """
     model = FaceResNetV1b(BottleneckV1b, [3, 4, 6, 3], deep_stem=True, avg_down=True,
-                          name_prefix='face_resnetv1d_', **kwargs)
+                           name_prefix='face_resnetv1d_', **kwargs)
 
     return model
-
 
 def resnet101_v1d(pretrained=False, root='~/.mxnet/models', ctx=cpu(0), **kwargs):
     """Constructs a ResNetV1d-50 model.

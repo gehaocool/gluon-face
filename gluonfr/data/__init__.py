@@ -23,6 +23,8 @@
 
 from .dataset import *
 
+# from .dali_utils import *
+
 """
 lfw:
 `"Labeled Faces in the Wild: A Database for Studying Face Recognition in Unconstrained Environments"
@@ -31,7 +33,7 @@ lfw:
 calfw:
 `"A Database for Studying Cross-Age Face Recognition in Unconstrained Environments"
  <http://arxiv.org/abs/1708.08197>_paper`
- 
+
 cplfw:
 `"Cross-pose LFW: A database for studying cross-pose face recognition in unconstrained environments"
  <http://www.whdeng.cn/CPLFW/Cross-Pose-LFW.pdf>_paper`
@@ -48,7 +50,6 @@ vgg2_fp:
 `"VGGFace2: A dataset for recognising faces across pose and age"
  <https://arxiv.org/abs/1710.08092>_paper`
 
- 
 """
 datasets = {"lfw": FRValDataset,
             "calfw": FRValDataset,
@@ -57,7 +58,7 @@ datasets = {"lfw": FRValDataset,
             "agedb_30": FRValDataset,
             "cfp_ff": FRValDataset,
             "vgg2_fp": FRValDataset,
-            "emore": FRTrainRecordDataset,
+            "faces_emore": FRTrainRecordDataset,
             "vgg": FRTrainRecordDataset,
             "webface": FRTrainRecordDataset,
             "asian_celeb": FRTrainRecordDataset,

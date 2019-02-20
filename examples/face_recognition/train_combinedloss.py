@@ -173,9 +173,9 @@ net.initialize(init=mx.init.Xavier(rnd_type='gaussian', factor_type='out', magni
 # net.initialize(init=mx.init.MSRAPrelu())
 # net.load_parameters("models/mobilefacenet-ring-it-185000.params", ctx=ctx)
 if opt.mode == 'hybrid':
-    net.hybridize(static_alloc=True, static_shape=True)
+    net.hybridize(static_alloc=True)
 logger.info(net)
-loss = CombinedLoss(train_set.num_classes, m1=opt.margin1, m2=opt.margin2, m3=opt.margin3, s=opt.scale, easy_margin=False)
+loss = CombinedLoss(train_set.num_classes, m1=opt.margin1, m2=opt.margin2, m3=opt.margin3, s=opt.scale)
 if opt.mode == 'hybrid':
     loss.hybridize(static_alloc=True, static_shape=True)
 logger.info(loss)

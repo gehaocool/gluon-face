@@ -31,7 +31,7 @@ from tqdm import tqdm
 from mxnet import gluon, autograd as ag
 from mxnet.gluon.data import DataLoader
 from datetime import datetime
-from gluoncv.utils import LRScheduler
+from gluonfr.utils import LRScheduler
 from gluonfr.loss import *
 from gluonfr.model_zoo import *
 from gluonfr.data import get_recognition_dataset
@@ -58,7 +58,7 @@ wd = 4e-5
 use_float16 = False
 trans = Transform(use_float16)
 
-train_set = get_recognition_dataset("emore", transform=trans.transform_train)
+train_set = get_recognition_dataset("faces_emore", transform=trans.transform_train)
 train_data = DataLoader(train_set, batch_size, shuffle=True, num_workers=num_worker, last_batch="discard")
 
 targets = ['lfw']

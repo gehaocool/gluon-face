@@ -228,8 +228,10 @@ class CombinedLoss(SoftmaxCrossEntropyLoss):
               batch_axis are averaged out.
         """
 
-    def __init__(self, classes, m1=1, m2=0.3, m3=0.2, s=64, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, classes, m1=1, m2=0.3, m3=0.2, s=64, easy_margin=True,
+                 axis=-1, sparse_label=True, weight=None, batch_axis=0, **kwargs):
+        super().__init__(axis=axis, sparse_label=sparse_label,
+                         weight=weight, batch_axis=batch_axis, **kwargs)
         assert s  >  0.
         assert m1 >  0.
         assert 0. <= m2 < (math.pi / 2)

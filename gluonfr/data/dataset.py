@@ -38,8 +38,10 @@ class FRTrainRecordDataset(RecordFileDataset):
 
     Parameters
     ----------
-    name : str. Name of val dataset.
-    root : str. Path to face folder. Default is '$(HOME)/mxnet/datasets/face'
+    name : str.
+        Name of val dataset.
+    root : str.
+        Path to face folder. Default is '$(HOME)/mxnet/datasets/face'
     transform : function, default None
         A user defined callback that transforms each sample. For example:
     ::
