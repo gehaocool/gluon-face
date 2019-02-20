@@ -25,7 +25,7 @@ import numpy as np
 from mxnet import nd, init
 from mxnet.gluon.loss import Loss, SoftmaxCrossEntropyLoss
 
-__all__ = ["SoftmaxCrossEntropyLoss", "ArcLoss", "TripletLoss", "RingLoss", "CosLoss",
+__all__ = ["SoftmaxCrossEntropyLoss", "ArcLoss", "CombinedLoss", "TripletLoss", "RingLoss", "CosLoss",
            "L2Softmax", "ASoftmax", "CenterLoss", "ContrastiveLoss", "LGMLoss", "MPSLoss",
            "GitLoss", "COCOLoss"]
 numeric_types = (float, int, np.generic)
@@ -204,6 +204,61 @@ class ArcLoss(SoftmaxCrossEntropyLoss):
         body = F.broadcast_mul(gt_one_hot, diff)
         pred = pred + body
         pred = pred * self.s
+
+        return super().hybrid_forward(F, pred=pred, label=label, sample_weight=sample_weight)
+
+
+class CombinedLoss(SoftmaxCrossEntropyLoss):
+    r"""Combined Margin Loss from
+        `insightface`
+        https://github.com/deepinsight/insightface
+
+        Parameters
+        ----------
+        classes: int.
+            Number of classes.
+        m1, m2, m3: float.
+            Margin parameters for loss.
+            m1cos(θ+m2)-m3
+        s: int.
+            Scale parameter for loss.
+
+        Outputs:
+            - **loss**: loss tensor with shape (batch_size,). Dimensions other than
+              batch_axis are averaged out.
+        """
+
+    def __init__(self, classes, m1=1, m2=0.3, m3=0.2, s=64, **kwargs):
+        super().__init__(**kwargs)
+        assert s  >  0.
+        assert m1 >  0.
+        assert 0. <= m2 < (math.pi / 2)
+        assert m3 >  0.
+        self.s    =  s
+        self.m1, self.m2, self.m3 = m1, m2, m3
+        self._classes = classes
+
+    def hybrid_forward(self, F, pred, label, sample_weight=None, *args, **kwargs):
+        if self.m1 != 1.0 or self.m2 != 0.0 or self.m3 != 0.0:
+            if self.m1 == 1.0 and self.m2 == 0.0:
+                gt_one_hot = F.one_hot(label, depth=self._classes, on_value=self.m3, off_value=0.0)
+                pred = pred - gt_one_hot
+            else:
+                cos_t = F.pick(pred, label, axis=1)
+                t = F.arccos(cos_t)
+                if self.m1 != 1.0:
+                    t = t * self.m1
+                if self.m2 > 0.0:
+                    t = t + self.m2
+                body = F.cos(t)
+                if self.m3 > 0.0:
+                    body = body - self.m3
+                diff = body - cos_t
+                diff = F.expand_dims(diff, 1)
+                gt_one_hot = F.one_hot(label, depth=self._classes, on_value=1.0, off_value=0.0)
+                body = F.broadcast_mul(gt_one_hot, diff)
+                pred = pred + body
+            pred = pred * self.s
 
         return super().hybrid_forward(F, pred=pred, label=label, sample_weight=sample_weight)
 

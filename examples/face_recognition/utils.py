@@ -6,7 +6,7 @@ import sklearn
 from mxnet import gluon, autograd as ag
 from mxnet.gluon.data.vision import transforms
 from gluonfr.metrics.verification import FaceVerification
-
+from mxnet.gluon import nn
 
 def inf_train_gen(loader):
     """
@@ -18,6 +18,22 @@ def inf_train_gen(loader):
         for batch in loader:
             yield batch
 
+
+# normalize method commonly used in face recognition.
+# operate on an image in the range [0, 255], subtract 127.5 and divided by 128
+# which is equal to Normalize a tensorized image in the range [0, 1)
+# with mean value 0.5=127.5/225 and std value 128/255
+# the class FaceTypeNormalizeTransform and face_type_normalize is almost equal
+# the tiny difference is due to numerical calculation
+class FaceTypeNormalizeTransform(nn.HybridBlock):
+    def __init__(self):
+        super(FaceTypeNormalizeTransform, self).__init__()
+
+    def hybrid_forward(self, F, x):
+        return (x*255-127.5)*0.0078125
+
+
+face_type_normalize = transforms.Normalize(0.5, 128/255)
 
 transform_test = transforms.Compose([
     transforms.ToTensor()
@@ -65,7 +81,7 @@ class Transform:
         return im
 
 
-def validate(net, ctx, val_datas, targets, nfolds=10, norm=True):
+def validate(logger, net, ctx, val_datas, targets, epoch, it, nfolds=10, norm=True):
     metric = FaceVerification(nfolds)
     results = []
     for loader, name in zip(val_datas, targets):
@@ -85,5 +101,6 @@ def validate(net, ctx, val_datas, targets, nfolds=10, norm=True):
                 metric.update(issame, embedding0, embedding1)
 
         tpr, fpr, accuracy, val, val_std, far, accuracy_std = metric.get()
-        results.append("{}: {:.6f}+-{:.6f}".format(name, accuracy, accuracy_std))
+        logger.info("[{}] Epoch[{}] Batch[{}]: {:.6f}+-{:.6f}".format(name, epoch, it, accuracy, accuracy_std))
+        results.append(accuracy)
     return results

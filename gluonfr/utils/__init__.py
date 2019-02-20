@@ -20,4 +20,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """"""
-from .lr_scheduler import IterLRScheduler
+from .lr_scheduler import LRScheduler
